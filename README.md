@@ -14,5 +14,14 @@
 
 ### Environment Variables
 Create a `.env` file in the `hris-backend` directory with the following content:
-JWT_SECRET=your_jwt_secret
-DATABASE_URL=sqlite:./database.sqlite
+PORT = your port number
+
+JWT_SECRET="your-jwt-secret"
+
+#FIREBASE
+API_KEY = "your-api-key"
+AUTH_DOMAIN = "your-auth-domain"
+PROJECT_ID = "your-project-id"
+STORAGE_BUCKET = "your-storage-bucket"
+MESSAGING_SENDER_ID = "your messaging-sender-id"
+APP_ID = "your-app-id"
