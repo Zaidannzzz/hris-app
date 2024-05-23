@@ -15,9 +15,11 @@ admin.initializeApp({
 });
 
 const db = firebase.firestore();
+const { Timestamp } = firebase.firestore;
 
 export default db;
 export {
+  Timestamp,
   admin,
   db,
   firebase,

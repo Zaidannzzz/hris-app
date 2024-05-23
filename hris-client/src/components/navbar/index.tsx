@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import React from "react";
 import { useMediaQuery } from "react-responsive";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
@@ -10,6 +10,7 @@ export const Navbar: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("/");
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 900px)" });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checker = () => {
@@ -57,7 +58,7 @@ export const Navbar: React.FC = () => {
               id="/"
             >
               <Link className="nav-link text-decoration-none" to="/">
-                Beranda
+                Home
               </Link>
             </p>
             <p
@@ -80,7 +81,7 @@ export const Navbar: React.FC = () => {
         </div>
       ) : (
         <>
-          {/* <Draggable nodeRef={draggableRef} onMouseDown={() => handleToggle()}> */}
+          <Draggable nodeRef={draggableRef} onMouseDown={() => handleToggle()}>
             <div
               ref={draggableRef}
               className="w-auto h-auto rounded-circle p-2 menuMobile"
@@ -107,14 +108,14 @@ export const Navbar: React.FC = () => {
                 >
                   <path
                     fill="#ef4444"
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12m7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586z"
-                    clip-rule="evenodd"
+                    clipRule="evenodd"
                   />
                 </svg>
               )}
             </div>
-          {/* </Draggable> */}
+          </Draggable>
           <Sidebar
             collapsedWidth={"0px"}
             width="100vw"
@@ -149,10 +150,10 @@ export const Navbar: React.FC = () => {
                   fontWeight: "bold",
                   color: window.location.pathname !== "/" ? "black" : "#00B1BB",
                 }}
-                onClick={() => (window.location.href = "/")}
+                onClick={() => (navigate("/"))}
               >
                 {" "}
-                Beranda{" "}
+                Home{" "}
               </MenuItem>
               <MenuItem
                 rootStyles={{
@@ -160,9 +161,9 @@ export const Navbar: React.FC = () => {
                   padding: "10px",
                   fontWeight: "bold",
                   color:
-                    window.location.pathname !== "/about" ? "black" : "#00B1BB",
+                    window.location.pathname !== "/profile" ? "black" : "#00B1BB",
                 }}
-                onClick={() => (window.location.href = "/about")}
+                onClick={() => (navigate("/profile"))}
               >
                 {" "}
                 Profile{" "}

@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app";
 
-interface User {
+export interface User {
   id: string;
   name: string;
   email: string;
@@ -8,4 +8,5 @@ interface User {
   role: 'admin' | 'employee';
   created_at: firebase.firestore.Timestamp;
   updated_at: firebase.firestore.Timestamp;
+  isActive: boolean;
 }

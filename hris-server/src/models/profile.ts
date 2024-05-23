@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app";
 
-interface Profile {
+export interface Profile {
   id: string;
   user_id: string; // ID of the corresponding user
   position: string;

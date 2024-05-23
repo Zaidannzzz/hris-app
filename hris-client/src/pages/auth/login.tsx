@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setAuth } from '../../redux/auth/AuthSlice';
+import * as AuthSlice from '../../redux/auth/AuthSlice';
 import Loading from '../../components/modal/Loading';
+import { requestLoginToServer } from '../../api/server/auth';
+import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -10,6 +12,7 @@ const Login: React.FC = () => {
   const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,8 +29,21 @@ const Login: React.FC = () => {
       return;
     }
 
-    dispatch(setAuth(true));
     setIsLoading(true);
+    const request = await requestLoginToServer(email, password);
+    if (request === 200) {
+      dispatch(AuthSlice.setAuth(true));
+      localStorage.setItem('isAuth', "true");
+      setIsLoading(false);
+      navigate('/'); // Redirect to home page
+    } else if (request === 500){
+      setIsLoading(false);
+      alert("Login failed");
+    }
+  };
+
+  const handleRegisterClick = () => {
+    window.location.href = "/auth/register"; // Redirect to register page
   };
 
   return (
@@ -66,6 +82,9 @@ const Login: React.FC = () => {
                 </div>
                 <button type="submit" className="btn btn-primary w-100" disabled={isLoading}>
                   {isLoading ? 'Logging in...' : 'Login'}
+                </button>
+                <button type="button" className="btn btn-secondary w-100 mt-3" onClick={handleRegisterClick}>
+                  Register
                 </button>
               </form>
             </div>

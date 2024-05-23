@@ -11,3 +11,25 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.myNavbar {
+  box-shadow: 1px 2px 23px 10px rgba(184, 184, 184, 0.37);
+  -webkit-box-shadow: 1px 2px 23px 10px rgba(184, 184, 184, 0.37);
+  -moz-box-shadow: 1px 2px 23px 10px rgba(184, 184, 184, 0.37);
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+}
+
+.menuMobile {
+  z-index: 999;
+  position: fixed;
+  top: 8px;
+  right: 5px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6.5px);
+  -webkit-backdrop-filter: blur(6.5px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+}

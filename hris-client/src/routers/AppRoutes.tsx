@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthRoutes } from "./AuthRoutes";
-import { PrivateRoutes } from "./PrivateRoutes";
 import { Provider } from "react-redux";
 import store from "../setup/redux/store";
+import { AuthRoutes } from "./AuthRoutes";
+import { PrivateRoutes } from "./PrivateRoutes";
 
 const AppRoutes: React.FC = () => {
   return (

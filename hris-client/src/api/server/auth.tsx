@@ -1,29 +1,28 @@
 import axios from "axios";
-import * as bcrypt from "bcryptjs";
 
-export const requestRegisterToServer = async (name: string, email: string, password: string, role: string) => {
-  const url = process.env.SERVER_URL! + '/register';
+export const requestRegisterToServer = async (name: string, email: string, password: string, role: string, position: string, department: string) => {
+  const serverUrl = process.env.SERVER_URL || "http://localhost:3001";
+  const url = `${serverUrl}/register`;
+  
   const reqBody = {
     name,
     email,
     password,
-    role
+    role,
+    position,
+    department
   }
 
-  const token = bcrypt.hashSync(process.env.REACT_APP_SERVER_TOKEN!, 10);
   try {
     //using axios
     const response = await axios.post(url, reqBody, {
       headers: {
         "Content-Type": "application/json",
-        Authorization:
-          `Bearer ${token}`,
       },
     });
-    //convert response to json
-    const responseJson = await response.data;
-    //return email
-    return responseJson.email;
+    const responseStatus = response.status;
+    //return status from server
+    return responseStatus;
   } catch (error) {
     console.log(error);
     return undefined;
@@ -31,28 +30,30 @@ export const requestRegisterToServer = async (name: string, email: string, passw
 }
 
 export const requestLoginToServer = async (email: string, password: string) => {
-  const url = process.env.SERVER_URL! + '/login';
+  const serverUrl = process.env.SERVER_URL || "http://localhost:3001";
+  const url = `${serverUrl}/login`;
   const reqBody = {
     email,
     password
   }
 
-  const token = bcrypt.hashSync(process.env.REACT_APP_SERVER_TOKEN!, 10);
   try {
     //using axios
     const response = await axios.post(url, reqBody, {
       headers: {
         "Content-Type": "application/json",
-        Authorization:
-          `Bearer ${token}`,
       },
     });
-    //convert response to json
-    const responseJson = await response.data;
-    //return email
-    return responseJson.email;
+    
+    const token = response.data.token
+    localStorage.setItem('token', token);
+    const userId = response.data.userId
+    localStorage.setItem('userId', userId);
+    const responseStatus = response.status;
+    //return status from server
+    return responseStatus;
   } catch (error) {
     console.log(error);
-    return undefined;
+    return 500;
   }
 }

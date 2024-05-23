@@ -1,48 +1,61 @@
-import bodyParser from "body-parser";
 import express from "express";
-import * as bcrypt from "bcrypt";
+import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
-import db from "../../db";
+import db, { Timestamp } from "../../db";
+import { converter } from "../../db/converter";
+import { User } from "../../models/user";
+import { Profile } from "../../models/profile";
 
 const auth = express.Router();
 const secretKey = process.env.JWT_SECRET;
 
-//Auth
+// Auth - Register
 auth.post('/register', async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, position, department } = req.body;
   try {
     // Validate parameters
-    if (!name || !email || !password || !role) {
-      return res.status(400).send({ error: "Missing parameter required" });
+    if (!name || !email || !password || !role || !position || !department) {
+      return res.status(400).send({ error: "Missing required parameters" });
     }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save to database
-    const userRecord = db.collection('users').doc();
-    await userRecord.set({
+    // Save user and profile to database
+    const userRef = db.collection('users').withConverter(converter<User>()).doc();
+    const profileRef = db.collection('profile').withConverter(converter<Profile>()).doc();
+
+    const userData = {
       name,
       email,
       password: hashedPassword,
       role,
-      created_at: new Date(),
-      updated_at: new Date(),
-    });
-    if (!userRecord) {
-      return res.status(400).send({ error: "Invalid user" });
-    }
+      created_at: Timestamp.now(),
+      updated_at: Timestamp.now(),
+    };
 
-    res.status(201).send({
-      message: "Success!",
-      user: userRecord.id,
-    });
+    const profileData = {
+      user_id: userRef.id,
+      position,
+      department,
+      created_at: Timestamp.now(),
+      updated_at: Timestamp.now(),
+    };
+
+    const batch = db.batch();
+    batch.set(userRef, userData);
+    batch.set(profileRef, profileData);
+
+    await batch.commit();
+
+    res.status(201).send({ message: "User registered successfully", userId: userRef.id });
   } catch (error) {
     console.error("Register error: ", error);
     res.status(500).send(error);
   }
-})
+});
 
+// Auth - Login
 auth.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -51,15 +64,20 @@ auth.post("/login", async (req, res) => {
       return res.status(400).send({ error: "Missing parameter required" });
     }
 
-    // Find the user
-    const userRef = db.collection('users').where('email', '==', email);
-    const userSnapshot = await userRef.get();
-    if (userSnapshot.empty) {
+    // Find the user by email
+    const userQuery = await db.collection('users').withConverter(converter<User>()).where('email', '==', email).get();
+    if (userQuery.empty) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const userDoc = userSnapshot.docs[0];
+    const userDoc = userQuery.docs[0];
     const userData = userDoc.data();
+    const userId = userQuery.docs[0].id;
+
+    // Ensure userData is not undefined
+    if (!userData) {
+      return res.status(500).json({ error: 'Failed to retrieve user data' });
+    }
 
     // Validate password
     const isPasswordValid = await bcrypt.compare(password, userData.password);
@@ -67,17 +85,18 @@ auth.post("/login", async (req, res) => {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
-    // update to database
-    await userDoc.ref.update({ updated_at: new Date() });
+    // Update last login time
+    await userDoc.ref.update({ updated_at: Timestamp.now() });
 
-    // Validate JWT key
+    // Generate JWT token
     if (!secretKey) {
       return;
     }
-    const token = jwt.sign({ userId: userData.id, role: userData.role }, secretKey, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: userId, role: userData.role }, secretKey, { expiresIn: '1h' });
 
     res.status(200).send({
-      message: `${email} with name ${userData.name} has sign In Successfully`,
+      userId: userId,
+      message: `${email} with name ${userData.name} has signed in successfully`,
       token: token
     });
   } catch (error: any) {
