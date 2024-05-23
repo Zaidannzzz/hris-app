@@ -2,6 +2,10 @@
 
 ## Setup Instructions
 
+### Clone Repository
+1. Clone the repository to your local machine: `git clone https://github.com/your-username/hris-app.git`
+2. Navigate to the cloned directory: `cd hris-app`
+
 ### Backend
 1. Navigate to the `hris-server` directory: `cd hris-server`
 2. Install dependencies: `npm install`
